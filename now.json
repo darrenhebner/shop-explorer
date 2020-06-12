@@ -1,0 +1,6 @@
+{
+  "routes": [
+    {"src": "/sw.js", "dest": "/build/sw.js"},
+    {"src": "/.*", "dest": "/api/server.ts"}
+  ]
+}
