@@ -14,8 +14,8 @@ export function App(pathname: string) {
   const meta = createResource(async () => {
     try {
       const response = await api(`https://${shop}/meta.json`);
-      const {name, description} = await response.json();
-      return {name, description};
+      const {name, description, url} = await response.json();
+      return {name, description, url};
     } catch (error) {
       return {
         name: 'No results found',
@@ -80,7 +80,7 @@ export function App(pathname: string) {
       <body>
         <nav>
           <form novalidate name="searchform" method="POST">
-            <input name="shop" type="url" value="${shop}" />
+            <input name="shop" type="url" value="${shop}" placeholder="Enter a shop url…" />
             <input type="submit" value="Search" onclick="searchform.action = '/' + searchform.shop.value"/>
           </form>
         </nav>
@@ -166,7 +166,6 @@ const reset = `
 
   a {
     text-decoration-skip-ink: auto;
-    color: inherit;
     text-decoration: none;
   }
 
@@ -196,17 +195,18 @@ const reset = `
 
 const variables = `
   :root {
+    --padding-x-small: 4px;
     --padding-small: 8px;
     --padding: 16px;
     --padding-large: 32px;
     --padding-x-large: 64px;
 
-    --text-small: 12px;
+    --text-small: 14px;
     --text: 16px;
     --text-large: 32px;
     --text-x-large: 128px;
 
-    --color-text: #1a202c;
+    --color-text: black;
     --color-background: white;
   }
 `;
@@ -222,41 +222,75 @@ const styles = `
   }
 
   body {
-    display: flex;
-    flex-direction: column;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 var(--padding);
   }
 
-  nav {
-    background: #2d3748;
+  nav form {
+    margin-top: var(--padding);
+    display: flex;
+  }
+
+  input[type="url"] {
+    font-size: var(--text-small);
+    flex-grow: 1;
+    background: #eeeeee;
+    border: 1px solid #eeeeee;
+    border-radius: 3px;
+    padding: var(--padding-x-small) var(--padding-small);
+  }
+
+  input[type="submit"] {
+    background: none;
+    font-size: var(--text-small);
+    color: #4C51BF;
+    border: none;
     padding: var(--padding-small);
   }
 
   header {
-    padding: var(--padding-small);
-    border-bottom: 1px solid #cbd5e0;
-  }
-
-  main {
-    display: flex;
-    flex-grow: 1;
+    padding: var(--padding) 0 var(--padding-small) 0;
   }
 
   ul {
     margin: 0;
     padding: 0;
-    border-right: 1px solid #cbd5e0;
   }
 
   li {
-    border-bottom: 1px solid #cbd5e0;
-    padding: var(--padding) var(--padding-small);
+    border-bottom: 1px solid #eeeeee;
+    padding: var(--padding) 0;
   }
 
-  .collections {
-    background: #e2e8f0;
+  a {
+    color: #4C51BF;
   }
 
-  .products {
-    background: #edf2f7;
+  .cta {
+    display: block;
+    background: var(--color-text);
+    color: var(--color-background);
+    text-align: center;
+    padding: var(--padding-small);
+    margin: var(--padding-large) 0;
+    border-radius: 5px;
+  }
+
+  h1, h2 {
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: var(--text-large);
+  }
+
+  h2 {
+    font-size: var(--text);
+    margin-bottom: var(--padding);
+  }
+
+  p {
+    font-size: var(--text-small);
   }
 `;
