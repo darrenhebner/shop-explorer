@@ -1,6 +1,12 @@
 import {h, createResource} from '../arvo';
 import {Params} from './types';
-import {Meta, ProductList, CollectionList, Product} from './components';
+import {
+  Meta,
+  ProductList,
+  CollectionList,
+  Product,
+  Breadcrumbs,
+} from './components';
 
 export function App(pathname: string) {
   const [, shop, collection, productHandle] = pathname.split('/');
@@ -88,6 +94,7 @@ export function App(pathname: string) {
         ${shop ? Meta(meta) : ''}
 
         <main>
+        ${Breadcrumbs(params, collections)}
         ${children()}
         </main>
 
@@ -141,7 +148,6 @@ const reset = `
   h4,
   p,
   ul[class],
-  ol[class],
   li,
   figure,
   figcaption,
@@ -201,6 +207,7 @@ const variables = `
     --padding-large: 32px;
     --padding-x-large: 64px;
 
+    --text-x-small: 12px;
     --text-small: 14px;
     --text: 16px;
     --text-large: 32px;
@@ -208,6 +215,7 @@ const variables = `
 
     --color-text: black;
     --color-background: white;
+    --color-grey: rgba(0, 0, 0, 0.6);
   }
 `;
 
@@ -292,5 +300,32 @@ const styles = `
 
   p {
     font-size: var(--text-small);
+  }
+
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    margin: 0 0 var(--padding) 0;
+  }
+
+  .breadcrumbs li {
+    border: none;
+    padding: 0;
+  }
+
+  .breadcrumbs li:not(:last-child):after {
+    content: '›';
+    color: rgba(0, 0, 0, 0.4);
+    margin: 0 var(--padding-x-small);
+  }
+
+  .breadcrumbs li a {
+    text-transform: uppercase;
+    font-size: var(--text-x-small);
+    color: var(--color-grey);
+  }
+
+  .breadcrumbs li:last-child {
+    font-weight: bold;
   }
 `;

@@ -5,7 +5,6 @@ export async function CollectionList({shop}: Params, collections) {
   const data = await collections.read();
 
   return h`
-    <h2>Collections</h2>
     <ul>
       ${data.map(
         (collection) =>

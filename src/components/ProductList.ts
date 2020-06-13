@@ -1,11 +1,14 @@
 import {h} from '../../arvo';
-import {Params} from '../types.ts';
+import {Params} from '../types';
 
 export async function ProductList({shop, collection}: Params, products) {
   const data = await products.read();
 
+  if (data.length === 0) {
+    return h`<p>This collection is empty.</p>`;
+  }
+
   return h`
-    <h2>Products</h2>
     <ul>
       ${data.map(
         (product) =>
