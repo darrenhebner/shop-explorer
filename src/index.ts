@@ -58,7 +58,7 @@ export function App(pathname: string) {
   function children() {
     switch (true) {
       case productHandle && productHandle.length > 0: {
-        return Product(product);
+        return Product(params, product);
       }
       case collection && collection.length > 0: {
         return ProductList(params, products);
@@ -233,7 +233,7 @@ const styles = `
   body {
     max-width: 500px;
     margin: 0 auto;
-    padding: 0 var(--padding);
+    padding: 0 var(--padding) var(--padding-x-large);
   }
 
   nav form {
@@ -285,6 +285,17 @@ const styles = `
     padding: var(--padding-small);
     margin: var(--padding-large) 0;
     border-radius: 5px;
+  }
+
+  .view-product {
+    display: inline-block;
+    background: var(--color-background);
+    text-align: center;
+    padding: var(--padding-small);
+    margin: var(--padding-large) 0;
+    border-radius: 5px;
+    border: 1px solid #4C51BF;
+    font-size: var(--text-small);
   }
 
   h1, h2 {
