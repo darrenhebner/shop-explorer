@@ -75,7 +75,7 @@ export function App(pathname: string) {
   return h`
     <html>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <title>${shop}</title>
         <style>
           ${reset}
@@ -163,6 +163,7 @@ const reset = `
     scroll-behavior: smooth;
     text-rendering: optimizeSpeed;
     line-height: 1.5;
+    touch-action: manipulation;
   }
 
   ul,
@@ -247,6 +248,7 @@ const styles = `
     border: 1px solid #eeeeee;
     border-radius: 3px;
     padding: var(--padding-x-small) var(--padding-small);
+    -webkit-appearance: none;
   }
 
   input[type="submit"] {
