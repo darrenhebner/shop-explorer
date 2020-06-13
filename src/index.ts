@@ -1,10 +1,6 @@
-import {h} from '../arvo';
-
-interface Params {
-  shop?: string;
-  collection?: string;
-  productHandle?: string;
-}
+import {h, createResource} from '../arvo';
+import {Params} from './types';
+import {Meta, ProductList, CollectionList, Product} from './components';
 
 export function App(pathname: string) {
   const [, shop, collection, productHandle] = pathname.split('/');
@@ -53,6 +49,23 @@ export function App(pathname: string) {
     return allProducts.find(({handle}) => handle === productHandle);
   });
 
+  function children() {
+    switch (true) {
+      case productHandle && productHandle.length > 0: {
+        return Product(product);
+      }
+      case collection && collection.length > 0: {
+        return ProductList(params, products);
+      }
+      case shop && shop.length > 0: {
+        return CollectionList(params, collections);
+      }
+      default: {
+        return `<h3>Search for a shop</h3>`;
+      }
+    }
+  }
+
   return h`
     <html>
       <head>
@@ -75,9 +88,7 @@ export function App(pathname: string) {
         ${shop ? Meta(meta) : ''}
 
         <main>
-        ${shop ? CollectionList(params, collections) : ''}
-        ${collection ? ProductList(params, products) : ''}
-        ${productHandle ? Product(product) : ''}
+        ${children()}
         </main>
 
         <script>
@@ -88,59 +99,6 @@ export function App(pathname: string) {
       </body>
     </html>
   `;
-}
-
-async function Meta(meta) {
-  const {name, description} = await meta.read();
-
-  return h`
-    <header>
-      <h1>${name}</h1>
-      <p>${description}</p>
-    </header>
-  `;
-}
-
-async function CollectionList({shop}: Params, collections) {
-  const data = await collections.read();
-
-  return h`
-    <ul class="collections">
-      ${data.map(
-        (collection) =>
-          h`<li><a href="/${shop}/${collection.handle}">${collection.title}</a></li>`
-      )}
-    </ul>
-  `;
-}
-
-async function ProductList({shop, collection}: Params, products) {
-  const data = await products.read();
-
-  return h`
-    <ul class="products">
-      ${data.map(
-        (product) =>
-          h`<li><a href="/${shop}/${collection}/${product.handle}">${product.title}</a></li>`
-      )}
-    </ul>
-  `;
-}
-
-async function Product(product) {
-  const {title} = await product.read();
-
-  return h`<h3>${title}</h3>`;
-}
-
-function createResource(fetcher) {
-  const result = fetcher();
-
-  return {
-    read() {
-      return result;
-    },
-  };
 }
 
 function api(path: string) {

@@ -43,6 +43,16 @@ export function h(strings: TemplateStringsArray, ...values: ArvoComponent[]) {
   return run();
 }
 
+export function createResource(fetcher) {
+  const result = fetcher();
+
+  return {
+    read() {
+      return result;
+    },
+  };
+}
+
 export type ArvoComponent =
   | Promise<AsyncGenerator<string>>
   | AsyncGenerator<string>
