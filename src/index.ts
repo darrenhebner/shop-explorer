@@ -8,6 +8,8 @@ import {
   Breadcrumbs,
 } from './components';
 
+import {NoResultError, MissingParamsError} from './errors';
+
 export function App(pathname: string) {
   const [, shop, collection, productHandle] = pathname.split('/');
 
@@ -18,32 +20,48 @@ export function App(pathname: string) {
   };
 
   const meta = createResource(async () => {
+    if (!shop) {
+      throw new MissingParamsError();
+    }
+
     try {
       const response = await api(`https://${shop}/meta.json`);
       const {name, description, url} = await response.json();
       return {name, description, url};
     } catch (error) {
-      return {
-        name: 'No results found',
-        description:
-          'Try <a href="/misen.co">misen.co</a> or <a href="/buypeel.com">buypeel.com</a>',
-      };
+      throw new NoResultError();
     }
   });
 
   const collections = createResource(async () => {
-    const response = await api(`https://${shop}/collections.json`);
-    const {collections} = await response.json();
-    return collections;
+    if (!shop) {
+      throw new MissingParamsError();
+    }
+
+    try {
+      const response = await api(`https://${shop}/collections.json`);
+      const {collections} = await response.json();
+      return collections;
+    } catch (err) {
+      throw new NoResultError();
+    }
   });
 
   const products = createResource(async () => {
-    const response = await api(
-      `https://${shop}/collections/${collection}/products.json`
-    );
+    if (!shop || !collection) {
+      return;
+    }
 
-    const {products} = await response.json();
-    return products;
+    try {
+      const response = await api(
+        `https://${shop}/collections/${collection}/products.json`
+      );
+
+      const {products} = await response.json();
+      return products;
+    } catch (err) {
+      throw new NoResultError();
+    }
   });
 
   const product = createResource(async () => {
@@ -51,8 +69,12 @@ export function App(pathname: string) {
       return;
     }
 
-    const allProducts = await products.read();
-    return allProducts.find(({handle}) => handle === productHandle);
+    try {
+      const allProducts = await products.read();
+      return allProducts.find(({handle}) => handle === productHandle);
+    } catch (err) {
+      throw new NoResultError();
+    }
   });
 
   function children() {
@@ -67,7 +89,7 @@ export function App(pathname: string) {
         return CollectionList(params, collections);
       }
       default: {
-        return `<h3>Search for a shop</h3>`;
+        return `<p></p>`;
       }
     }
   }
@@ -76,6 +98,7 @@ export function App(pathname: string) {
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✌️</text></svg>">
         <title>${shop}</title>
         <style>
           ${reset}
@@ -86,12 +109,20 @@ export function App(pathname: string) {
       <body>
         <nav>
           <form novalidate name="searchform" method="POST">
-            <input name="shop" type="url" value="${shop}" placeholder="Enter a shop url…" />
+            <input type="search" list="suggestions" name="shop" placeholder="Enter a shop url…" />
+
+            <datalist id="suggestions">
+              <option value="misen.co">
+              <option value="buypeel.com">
+              <option value="uturnaudio.com">
+              <option value="whatsupton.com">
+            </datalist>
+
             <input type="submit" value="Search" onclick="searchform.action = '/' + searchform.shop.value"/>
           </form>
         </nav>
 
-        ${shop ? Meta(meta) : ''}
+        ${Meta(meta)}
 
         <main>
         ${Breadcrumbs(params, collections)}
@@ -164,6 +195,8 @@ const reset = `
     text-rendering: optimizeSpeed;
     line-height: 1.5;
     touch-action: manipulation;
+    -webkit-tap-highlight-color;
+    -webkit-touch-callout;
   }
 
   ul,
@@ -241,7 +274,7 @@ const styles = `
     display: flex;
   }
 
-  input[type="url"] {
+  input[type="search"] {
     font-size: var(--text-small);
     flex-grow: 1;
     background: #eeeeee;
@@ -254,7 +287,7 @@ const styles = `
   input[type="submit"] {
     background: none;
     font-size: var(--text-small);
-    color: #4C51BF;
+    color: #4299E1;
     border: none;
     padding: var(--padding-small);
   }
@@ -274,7 +307,7 @@ const styles = `
   }
 
   a {
-    color: #4C51BF;
+    color: #4299E1;
   }
 
   .cta {
@@ -294,7 +327,7 @@ const styles = `
     padding: var(--padding-small);
     margin: var(--padding-large) 0;
     border-radius: 5px;
-    border: 1px solid #4C51BF;
+    border: 1px solid #4299E1;
     font-size: var(--text-small);
   }
 

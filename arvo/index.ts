@@ -12,15 +12,17 @@ const encoder = new TextEncoder();
 
 export function renderToStream(app: AsyncGenerator<string>) {
   return new ReadableStream({
-    async start(controller) {
-      for await (let value of app) {
-        controller.enqueue(encoder.encode(value));
+    async pull(controller) {
+      const {done, value} = await app.next()
+
+      if (done) {
+        controller.close();
       }
 
-      controller.close();
+      controller.enqueue(encoder.encode(value))
     },
   });
-}
+}}
 
 export function h(strings: TemplateStringsArray, ...values: ArvoComponent[]) {
   const allItems: AsyncGenerator<string> | ArvoComponent[] = [];

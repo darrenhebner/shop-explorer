@@ -10,14 +10,18 @@
     "parcel-bundler": "^1.12.4",
     "typescript": "^3.9.2"
   },
+  "browserslist": [
+    "last 1 Chrome version"
+  ],
   "scripts": {
     "dev": "npm-run-all dev-server & yarn dev-client",
-    "dev-client": "parcel watch service-worker/index.ts -d build --out-file sw.js",
-    "build-client": "parcel build service-worker/index.ts -d build --out-file sw.js",
+    "dev:client": "parcel watch service-worker/index.ts -d build --out-file sw.js",
+    "build:client": "parcel build service-worker/index.ts -d build --out-file sw.js",
     "dev-server": "now dev",
     "deploy": "now"
   },
   "dependencies": {
+    "arvo-stream": "^0.0.1",
     "node-fetch": "^2.6.0"
   }
 }

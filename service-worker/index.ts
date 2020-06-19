@@ -10,10 +10,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  const {pathname} = new URL(event.request.url);
-  event.respondWith(
-    new Response(renderToStream(App(pathname)), {
-      headers: {'Content-Type': 'text/html; charset=utf-8 '},
-    })
-  );
+  if (event.request.mode === 'navigate') {
+    const {pathname} = new URL(event.request.url);
+    event.respondWith(
+      new Response(renderToStream(App(pathname)), {
+        headers: {'Content-Type': 'text/html; charset=utf-8 '},
+      })
+    );
+  } else {
+    event.respondWith(fetch(event.request));
+  }
 });
